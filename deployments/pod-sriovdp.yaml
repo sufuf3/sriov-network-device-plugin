@@ -7,8 +7,10 @@ spec:
   - name: sriov-device-plugin 
     image: sriov-device-plugin 
     imagePullPolicy: IfNotPresent
-    command: [ "/bin/bash", "-c", "--" ]
-    args: [ "while true; do sleep 300000; done;" ]
+    command: [ "./usr/bin/sriovdp" ]
+    args: [ "--logtostderr", "-v", "20" ]
+#    command: [ "/bin/bash", "-c", "--" ]
+#    args: [ "while true; do sleep 300000; done;" ]
     volumeMounts:
     - mountPath: /var/lib/kubelet/device-plugins/ 
       name: devicesock 

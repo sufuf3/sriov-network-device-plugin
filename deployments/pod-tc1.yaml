@@ -13,8 +13,34 @@ spec:
     imagePullPolicy: IfNotPresent
     command: [ "/bin/bash", "-c", "--" ]
     args: [ "while true; do sleep 300000; done;" ]
+  initContainers:
+  - name: init-network-client
+    image: sdnvortex/network-controller:v0.4.6
+    command: ["/go/bin/client"]
+    args: ["-s=unix:///tmp/vortex.sock", "-n=eth100", "-if0=ens5f0", "-i=192.168.24.50/24"]
     resources:
       requests:
-        intel.com/sriov: '1' 
+        intel.com/sriov: '1'
       limits:
         intel.com/sriov: '1'
+    env:
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+    - name: POD_NAMESPACE
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.namespace
+    - name: POD_UUID
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.uid
+    volumeMounts:
+    - mountPath: /tmp/
+      name: grpc-sock
+  restartPolicy: Never
+  volumes:
+  - name: grpc-sock
+    hostPath:
+      path: /tmp/vortex/
